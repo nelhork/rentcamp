@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Order;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\OrderRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,28 +10,20 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class OrderController extends AbstractController
 {
-    #[Route('/order', name: 'app_order')]
-    public function index(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/order', name: 'app_order', methods: ['GET'])]
+    public function index(Request $request, OrderRepository $orderRepository): JsonResponse
     {
         $params = $request->query->all();
+        $orders = $orderRepository->getListOrders($params);
 
-        $orders = $entityManager->getRepository(Order::class)->getListOrders($params);
-
-        $ids = [];
-        foreach ($orders as $order)
-        {
-            $ids[] = $order['id'];
-        }
-
-        return $this->json($ids);
+        return $this->json($orders);
     }
 
-    #[Route('/order/details', name: 'app_order_details')]
-    public function getDetails(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/order/details', name: 'app_order_details', methods: ['GET'])]
+    public function getDetails(Request $request, OrderRepository $orderRepository): JsonResponse
     {
         $params = $request->query->all();
-
-        $orders = $entityManager->getRepository(Order::class)->getListOrdersWithDetails($params);
+        $orders = $orderRepository->getListOrdersWithDetails($params);
 
         return $this->json($orders);
     }

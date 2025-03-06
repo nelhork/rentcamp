@@ -16,98 +16,22 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
-    public function getListOrders(array $params)
+    public function getListOrders(array $params): array
     {
-        $db = $this->createQueryBuilder('o')
-            ->select('DISTINCT o.id')
+        $queryBuilder = $this->createQueryBuilder('o')
+            ->select('o.id')
             ->innerJoin('o.client', 'c')
-            ->innerJoin('o.status', 's');
+            ->innerJoin('o.status', 's')
+            ->orderBy('o.id', 'ASC');
 
-        $conditions = [
-            'phone' => function ($db, $value)
-            {
-                $db->where('c.phone1 = :phone')
-                    ->orWhere('c.phone2 = :phone')
-                    ->orWhere('c.phone3 = :phone')
-                    ->setParameter('phone', $value);
-            },
-            'comment' => function ($db, $value)
-            {
-                $db->where('o.comment = :comment')
-                    ->setParameter('comment', $value);
-            },
-            'status' => function ($db, $value)
-            {
-                $db->where('s.name = :status')
-                    ->setParameter('status', $value);
-            },
-            'client_id' => function ($db, $value)
-            {
-                $db->where('o.client = :client_id')
-                    ->setParameter('client_id', $value);
-            },
-            'order_id' => function ($db, $value)
-            {
-                $db->where('o.id = :order_id')
-                    ->setParameter('order_id', $value);
-            },
-            'begin' => function ($db, $value)
-            {
-                $db->where('DATE(o.begin) = DATE(:begin)')
-                    ->setParameter('begin', \DateTime::createFromFormat('d.m.Y H:i:s', $value));
-            },
-            'end_time' => function ($db, $value)
-            {
-                $db->where('DATE(o.end_time) = DATE(:end_time)')
-                    ->setParameter('end_time', \DateTime::createFromFormat('d.m.Y H:i:s', $value));
-            },
-            'total_amount' => function ($db, $value)
-            {
-                $db->where('o.total_amount = :total_amount')
-                    ->setParameter('total_amount', $value);
-            },
-            'total_deposit' => function ($db, $value)
-            {
-                $db->where('o.total_deposit = :total_deposit')
-                    ->setParameter('total_deposit', $value);
-            },
-            'giver_id' => function ($db, $value)
-            {
-                $db->where('o.giver = :giver_id')
-                    ->setParameter('giver_id', $value);
-            },
-            'taker_id' => function ($db, $value)
-            {
-                $db->where('o.taker = :taker_id')
-                    ->setParameter('taker_id', $value);
-            },
-            'give_stock_id' => function ($db, $value)
-            {
-                $db->where('o.give_stock = :give_stock_id')
-                    ->setParameter('give_stock_id', $value);
-            },
-            'take_stock_id' => function ($db, $value)
-            {
-                $db->where('o.take_stock = :take_stock_id')
-                    ->setParameter('take_stock_id', $value);
-            }
-        ];
+        $this->applyFilters($queryBuilder, $params);
 
-        // Применить фильтры из переданных параметров
-        foreach ($params as $key => $value)
-        {
-            if (array_key_exists($key, $conditions) && !empty($value))
-            {
-                $conditions[$key]($db, $value);
-            }
-        }
-
-        return $db->getQuery()->getResult();
+        return $queryBuilder->getQuery()->getArrayResult();
     }
 
-    public function getListOrdersWithDetails(array $params)
+    public function getListOrdersWithDetails(array $params): array
     {
-        $db = $this->createQueryBuilder('o')
+        $queryBuilder = $this->createQueryBuilder('o')
             ->select('
                 o.id,
                 s.name as status,
@@ -132,93 +56,99 @@ class OrderRepository extends ServiceEntityRepository
             ->leftJoin('o.give_stock', 'gs')
             ->leftJoin('o.take_stock', 'ts');
 
-        $conditions = [
-            'phone' => function ($db, $value)
-            {
-                $db->andWhere('c.phone1 = :phone OR c.phone2 = :phone OR c.phone3 = :phone')
-                    ->setParameter('phone', $value);
-            },
-            'comment' => function ($db, $value)
-            {
-                $db->andWhere('o.comment = :comment')
-                    ->setParameter('comment', $value);
-            },
-            'status' => function ($db, $value)
-            {
-                $db->andWhere('s.name = :status')
-                    ->setParameter('status', $value);
-            },
-            'client_id' => function ($db, $value)
-            {
-                $db->andWhere('o.client = :client_id')
-                    ->setParameter('client_id', $value);
-            },
-            'order_id' => function ($db, $value)
-            {
-                $db->andWhere('o.id = :order_id')
-                    ->setParameter('order_id', $value);
-            },
-            'begin' => function ($db, $value)
-            {
-                $date = \DateTime::createFromFormat('d.m.Y H:i:s', $value);
-                if ($date)
-                {
-                    $db->andWhere('o.begin BETWEEN :begin_start AND :begin_end')
-                        ->setParameter('begin_start', $date->format('Y-m-d 00:00:00'))
-                        ->setParameter('begin_end', $date->format('Y-m-d 23:59:59'));
-                }
-            },
-            'end_time' => function ($db, $value)
-            {
-                $date = \DateTime::createFromFormat('d.m.Y H:i:s', $value);
-                if ($date)
-                {
-                    $db->andWhere('o.end_time BETWEEN :end_start AND :end_end')
-                        ->setParameter('end_start', $date->format('Y-m-d 00:00:00'))
-                        ->setParameter('end_end', $date->format('Y-m-d 23:59:59'));
-                }
-            },
-            'total_amount' => function ($db, $value)
-            {
-                $db->andWhere('o.total_amount = :total_amount')
-                    ->setParameter('total_amount', $value);
-            },
-            'total_deposit' => function ($db, $value)
-            {
-                $db->andWhere('o.total_deposit = :total_deposit')
-                    ->setParameter('total_deposit', $value);
-            },
-            'giver_id' => function ($db, $value)
-            {
-                $db->andWhere('o.giver = :giver_id')
-                    ->setParameter('giver_id', $value);
-            },
-            'taker_id' => function ($db, $value)
-            {
-                $db->andWhere('o.taker = :taker_id')
-                    ->setParameter('taker_id', $value);
-            },
-            'give_stock_id' => function ($db, $value)
-            {
-                $db->andWhere('o.give_stock = :give_stock_id')
-                    ->setParameter('give_stock_id', $value);
-            },
-            'take_stock_id' => function ($db, $value)
-            {
-                $db->andWhere('o.take_stock = :take_stock_id')
-                    ->setParameter('take_stock_id', $value);
-            }
-        ];
+        $this->applyFilters($queryBuilder, $params);
 
-        // Применить фильтры из переданных параметров
-        foreach ($params as $key => $value)
+        return $queryBuilder->getQuery()->getArrayResult();
+    }
+
+    private function applyFilters($queryBuilder, array $params): void
+    {
+        if (!empty($params['phone']))
         {
-            if (isset($conditions[$key]) && !empty($value))
+            $queryBuilder->andWhere('c.phone1 = :phone OR c.phone2 = :phone OR c.phone3 = :phone')
+                ->setParameter('phone', $params['phone']);
+        }
+
+        if (!empty($params['comment']))
+        {
+            $queryBuilder->andWhere('o.comment = :comment')
+                ->setParameter('comment', $params['comment']);
+        }
+
+        if (!empty($params['status']))
+        {
+            $queryBuilder->andWhere('s.name = :status')
+                ->setParameter('status', $params['status']);
+        }
+
+        if (!empty($params['client_id']))
+        {
+            $queryBuilder->andWhere('o.client = :client_id')
+                ->setParameter('client_id', $params['client_id']);
+        }
+
+        if (!empty($params['order_id']))
+        {
+            $queryBuilder->andWhere('o.id = :order_id')
+                ->setParameter('order_id', $params['order_id']);
+        }
+
+        if (!empty($params['begin']))
+        {
+            $date = \DateTime::createFromFormat('d.m.Y H:i:s', $params['begin']);
+            if ($date)
             {
-                $conditions[$key]($db, $value);
+                $queryBuilder->andWhere('o.begin BETWEEN :begin_start AND :begin_end')
+                    ->setParameter('begin_start', $date->format('Y-m-d 00:00:00'))
+                    ->setParameter('begin_end', $date->format('Y-m-d 23:59:59'));
             }
         }
 
-        return $db->getQuery()->getResult();
+        if (!empty($params['end_time']))
+        {
+            $date = \DateTime::createFromFormat('d.m.Y H:i:s', $params['end_time']);
+            if ($date)
+            {
+                $queryBuilder->andWhere('o.end_time BETWEEN :end_start AND :end_end')
+                    ->setParameter('end_start', $date->format('Y-m-d 00:00:00'))
+                    ->setParameter('end_end', $date->format('Y-m-d 23:59:59'));
+            }
+        }
+
+        if (!empty($params['total_amount']))
+        {
+            $queryBuilder->andWhere('o.total_amount = :total_amount')
+                ->setParameter('total_amount', $params['total_amount']);
+        }
+
+        if (!empty($params['total_deposit']))
+        {
+            $queryBuilder->andWhere('o.total_deposit = :total_deposit')
+                ->setParameter('total_deposit', $params['total_deposit']);
+        }
+
+        if (!empty($params['giver_id']))
+        {
+            $queryBuilder->andWhere('o.giver = :giver_id')
+                ->setParameter('giver_id', $params['giver_id']);
+        }
+
+        if (!empty($params['taker_id']))
+        {
+            $queryBuilder->andWhere('o.taker = :taker_id')
+                ->setParameter('taker_id', $params['taker_id']);
+        }
+
+        if (!empty($params['give_stock_id']))
+        {
+            $queryBuilder->andWhere('o.give_stock = :give_stock_id')
+                ->setParameter('give_stock_id', $params['give_stock_id']);
+        }
+
+        if (!empty($params['take_stock_id']))
+        {
+            $queryBuilder->andWhere('o.take_stock = :take_stock_id')
+                ->setParameter('take_stock_id', $params['take_stock_id']);
+        }
     }
 }
