@@ -37,6 +37,7 @@ class OrderRepository extends ServiceEntityRepository
                 s.name as status,
                 o.comment,
                 c.id as client_id,
+                c.name as client_name,
                 o.created,
                 o.begin,
                 o.end_time as end,
@@ -47,10 +48,14 @@ class OrderRepository extends ServiceEntityRepository
                 g.id as giver_id,
                 t.id as taker_id,
                 gs.id as give_stock_id,
-                ts.id as take_stock_id
+                ts.id as take_stock_id,
+                m.id as model_id,
+                m.name as model_name
             ')
             ->innerJoin('o.status', 's')
             ->innerJoin('o.client', 'c')
+            ->innerJoin('o.modelsToOrders', 'mto')
+            ->innerJoin('mto.modelRef', 'm')
             ->leftJoin('o.giver', 'g')
             ->leftJoin('o.taker', 't')
             ->leftJoin('o.give_stock', 'gs')
