@@ -68,6 +68,14 @@ class Order
     #[ORM\JoinColumn(nullable: false)]
     private ?Stock $take_stock = null;
 
+    #[ORM\OneToMany(targetEntity: ModelsToOrders::class, mappedBy: 'orderRef')]
+    private Collection $modelsToOrders;
+
+    public function __construct()
+    {
+        $this->modelsToOrders = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -256,6 +264,35 @@ class Order
     public function setTakeStockId(?Stock $take_stock_id): static
     {
         $this->take_stock_id = $take_stock_id;
+
+        return $this;
+    }
+
+    public function getModelsToOrders(): Collection
+    {
+        return $this->modelsToOrders;
+    }
+
+    public function addModelsToOrder(ModelsToOrders $modelsToOrder): static
+    {
+        if (!$this->modelsToOrders->contains($modelsToOrder))
+        {
+            $this->modelsToOrders->add($modelsToOrder);
+            $modelsToOrder->setOrderRef($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModelsToOrder(ModelsToOrders $modelsToOrder): static
+    {
+        if ($this->modelsToOrders->removeElement($modelsToOrder))
+        {
+            if ($modelsToOrder->getOrderRef() === $this)
+            {
+                $modelsToOrder->setOrderRef(null);
+            }
+        }
 
         return $this;
     }

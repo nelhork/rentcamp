@@ -71,10 +71,14 @@ class Model
     #[ORM\JoinTable(name: 'models_to_orders')]
     private Collection $orders;
 
+    #[ORM\OneToMany(targetEntity: ModelsToOrders::class, mappedBy: 'modelRef')]
+    private Collection $modelsToOrders;
+
     public function __construct()
     {
         $this->pricelists = new ArrayCollection();
         $this->order_items = new ArrayCollection();
+        $this->modelsToOrders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -255,7 +259,8 @@ class Model
 
     public function addPricelist(Pricelist $pricelist): static
     {
-        if (!$this->pricelists->contains($pricelist)) {
+        if (!$this->pricelists->contains($pricelist))
+        {
             $this->pricelists->add($pricelist);
             $pricelist->setModelId($this);
         }
@@ -265,9 +270,11 @@ class Model
 
     public function removePricelist(Pricelist $pricelist): static
     {
-        if ($this->pricelists->removeElement($pricelist)) {
+        if ($this->pricelists->removeElement($pricelist))
+        {
             // set the owning side to null (unless already changed)
-            if ($pricelist->getModelId() === $this) {
+            if ($pricelist->getModelId() === $this)
+            {
                 $pricelist->setModelId(null);
             }
         }
@@ -285,7 +292,8 @@ class Model
 
     public function addOrderItem(Item $orderItem): static
     {
-        if (!$this->order_items->contains($orderItem)) {
+        if (!$this->order_items->contains($orderItem))
+        {
             $this->order_items->add($orderItem);
             $orderItem->setModelId($this);
         }
@@ -295,13 +303,42 @@ class Model
 
     public function removeOrderItem(Item $orderItem): static
     {
-        if ($this->order_items->removeElement($orderItem)) {
+        if ($this->order_items->removeElement($orderItem))
+        {
             // set the owning side to null (unless already changed)
-            if ($orderItem->getModelId() === $this) {
+            if ($orderItem->getModelId() === $this)
+            {
                 $orderItem->setModelId(null);
             }
         }
 
+        return $this;
+    }
+
+    public function getModelsToOrders(): Collection
+    {
+        return $this->modelsToOrders;
+    }
+
+    public function addModelsToOrder(ModelsToOrders $modelsToOrder): static
+    {
+        if (!$this->modelsToOrders->contains($modelsToOrder))
+        {
+            $this->modelsToOrders->add($modelsToOrder);
+            $modelsToOrder->setModelRef($this);
+        }
+        return $this;
+    }
+
+    public function removeModelsToOrder(ModelsToOrders $modelsToOrder): static
+    {
+        if ($this->modelsToOrders->removeElement($modelsToOrder))
+        {
+            if ($modelsToOrder->getModelRef() === $this)
+            {
+                $modelsToOrder->setModelRef(null);
+            }
+        }
         return $this;
     }
 }
