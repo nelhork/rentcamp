@@ -137,7 +137,8 @@ class Stock
 
     public function addGivingOrder(Order $givingOrder): static
     {
-        if (!$this->giving_orders->contains($givingOrder)) {
+        if (!$this->giving_orders->contains($givingOrder))
+        {
             $this->giving_orders->add($givingOrder);
             $givingOrder->setGiveStockId($this);
         }
@@ -147,7 +148,8 @@ class Stock
 
     public function removeGivingOrder(Order $givingOrder): static
     {
-        if ($this->giving_orders->removeElement($givingOrder)) {
+        if ($this->giving_orders->removeElement($givingOrder))
+        {
             // set the owning side to null (unless already changed)
             if ($givingOrder->getGiveStockId() === $this) {
                 $givingOrder->setGiveStockId(null);
@@ -167,7 +169,8 @@ class Stock
 
     public function addTakingOrder(Order $takingOrder): static
     {
-        if (!$this->taking_orders->contains($takingOrder)) {
+        if (!$this->taking_orders->contains($takingOrder))
+        {
             $this->taking_orders->add($takingOrder);
             $takingOrder->setTakeStockId($this);
         }
@@ -177,9 +180,11 @@ class Stock
 
     public function removeTakingOrder(Order $takingOrder): static
     {
-        if ($this->taking_orders->removeElement($takingOrder)) {
+        if ($this->taking_orders->removeElement($takingOrder))
+        {
             // set the owning side to null (unless already changed)
-            if ($takingOrder->getTakeStockId() === $this) {
+            if ($takingOrder->getTakeStockId() === $this)
+            {
                 $takingOrder->setTakeStockId(null);
             }
         }
@@ -197,7 +202,8 @@ class Stock
 
     public function addOrderItem(Item $orderItem): static
     {
-        if (!$this->order_items->contains($orderItem)) {
+        if (!$this->order_items->contains($orderItem))
+        {
             $this->order_items->add($orderItem);
             $orderItem->setStockId($this);
         }
@@ -207,9 +213,11 @@ class Stock
 
     public function removeOrderItem(Item $orderItem): static
     {
-        if ($this->order_items->removeElement($orderItem)) {
+        if ($this->order_items->removeElement($orderItem))
+        {
             // set the owning side to null (unless already changed)
-            if ($orderItem->getStockId() === $this) {
+            if ($orderItem->getStockId() === $this)
+            {
                 $orderItem->setStockId(null);
             }
         }
@@ -227,7 +235,8 @@ class Stock
 
     public function addItemMovement(Movement $itemMovement): static
     {
-        if (!$this->item_movements->contains($itemMovement)) {
+        if (!$this->item_movements->contains($itemMovement))
+        {
             $this->item_movements->add($itemMovement);
             $itemMovement->setFromStockId($this);
         }
@@ -237,9 +246,11 @@ class Stock
 
     public function removeItemMovement(Movement $itemMovement): static
     {
-        if ($this->item_movements->removeElement($itemMovement)) {
+        if ($this->item_movements->removeElement($itemMovement))
+        {
             // set the owning side to null (unless already changed)
-            if ($itemMovement->getFromStockId() === $this) {
+            if ($itemMovement->getFromStockId() === $this)
+            {
                 $itemMovement->setFromStockId(null);
             }
         }
@@ -257,7 +268,8 @@ class Stock
 
     public function addItemMovementsTo(Movement $itemMovementsTo): static
     {
-        if (!$this->item_movements_to->contains($itemMovementsTo)) {
+        if (!$this->item_movements_to->contains($itemMovementsTo))
+        {
             $this->item_movements_to->add($itemMovementsTo);
             $itemMovementsTo->setToStockId($this);
         }
@@ -267,9 +279,11 @@ class Stock
 
     public function removeItemMovementsTo(Movement $itemMovementsTo): static
     {
-        if ($this->item_movements_to->removeElement($itemMovementsTo)) {
+        if ($this->item_movements_to->removeElement($itemMovementsTo))
+        {
             // set the owning side to null (unless already changed)
-            if ($itemMovementsTo->getToStockId() === $this) {
+            if ($itemMovementsTo->getToStockId() === $this)
+            {
                 $itemMovementsTo->setToStockId(null);
             }
         }

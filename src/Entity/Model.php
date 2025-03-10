@@ -69,9 +69,8 @@ class Model
 
     #[ORM\ManyToMany(targetEntity: Order::class, inversedBy: 'models')]
     #[ORM\JoinTable(name: 'models_to_orders')]
-    private Collection $orders;
 
-    #[ORM\OneToMany(targetEntity: ModelsToOrders::class, mappedBy: 'modelRef')]
+    #[ORM\OneToMany(targetEntity: ModelsToOrders::class, mappedBy: 'model')]
     private Collection $modelsToOrders;
 
     public function __construct()
@@ -262,7 +261,7 @@ class Model
         if (!$this->pricelists->contains($pricelist))
         {
             $this->pricelists->add($pricelist);
-            $pricelist->setModelId($this);
+            $pricelist->setModel($this);
         }
 
         return $this;
@@ -273,9 +272,9 @@ class Model
         if ($this->pricelists->removeElement($pricelist))
         {
             // set the owning side to null (unless already changed)
-            if ($pricelist->getModelId() === $this)
+            if ($pricelist->getModel() === $this)
             {
-                $pricelist->setModelId(null);
+                $pricelist->setModel(null);
             }
         }
 
@@ -325,7 +324,7 @@ class Model
         if (!$this->modelsToOrders->contains($modelsToOrder))
         {
             $this->modelsToOrders->add($modelsToOrder);
-            $modelsToOrder->setModelRef($this);
+            $modelsToOrder->setModel($this);
         }
         return $this;
     }
@@ -334,9 +333,9 @@ class Model
     {
         if ($this->modelsToOrders->removeElement($modelsToOrder))
         {
-            if ($modelsToOrder->getModelRef() === $this)
+            if ($modelsToOrder->getModel() === $this)
             {
-                $modelsToOrder->setModelRef(null);
+                $modelsToOrder->setModel(null);
             }
         }
         return $this;

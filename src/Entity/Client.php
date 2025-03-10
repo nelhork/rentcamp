@@ -143,6 +143,7 @@ class Client
     public function setDiscount(float $discount): static
     {
         $this->discount = $discount;
+
         return $this;
     }
 

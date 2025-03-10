@@ -17,15 +17,15 @@ class Order
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'order_status', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\OneToOne]
+    #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'id', unique: true, nullable: false)]
     private ?Status $status = null;
 
     #[ORM\Column(length: 255)]
     private ?string $comment = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'client_id', referencedColumnName: 'id', nullable: false)]
     private ?Client $client = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -53,22 +53,22 @@ class Order
     private ?float $total_deposit = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'giver_id', referencedColumnName: 'id', nullable: false)]
     private ?Employee $giver = null;
 
     #[ORM\ManyToOne(inversedBy: 'taking_orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'taker_id', referencedColumnName: 'id', nullable: false)]
     private ?Employee $taker = null;
 
     #[ORM\ManyToOne(inversedBy: 'giving_orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'give_stock_id', referencedColumnName: 'id', nullable: false)]
     private ?Stock $give_stock = null;
 
     #[ORM\ManyToOne(inversedBy: 'taking_orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'take_stock_id', referencedColumnName: 'id', nullable: false)]
     private ?Stock $take_stock = null;
 
-    #[ORM\OneToMany(targetEntity: ModelsToOrders::class, mappedBy: 'orderRef')]
+    #[ORM\OneToMany(targetEntity: ModelsToOrders::class, mappedBy: 'order')]
     private Collection $modelsToOrders;
 
     public function __construct()
@@ -90,12 +90,12 @@ class Order
 
     public function getStatusId(): ?Status
     {
-        return $this->status_id;
+        return $this->status;
     }
 
     public function setStatusId(Status $status_id): static
     {
-        $this->status_id = $status_id;
+        $this->status = $status_id;
 
         return $this;
     }
@@ -114,12 +114,12 @@ class Order
 
     public function getClientId(): ?Client
     {
-        return $this->client_id;
+        return $this->client;
     }
 
     public function setClientId(?Client $client_id): static
     {
-        $this->client_id = $client_id;
+        $this->client = $client_id;
 
         return $this;
     }
@@ -222,48 +222,48 @@ class Order
 
     public function getGiverId(): ?Employee
     {
-        return $this->giver_id;
+        return $this->giver;
     }
 
     public function setGiverId(?Employee $giver_id): static
     {
-        $this->giver_id = $giver_id;
+        $this->giver = $giver_id;
 
         return $this;
     }
 
     public function getTakerId(): ?Employee
     {
-        return $this->taker_id;
+        return $this->taker;
     }
 
     public function setTakerId(?Employee $taker_id): static
     {
-        $this->taker_id = $taker_id;
+        $this->taker = $taker_id;
 
         return $this;
     }
 
     public function getGiveStockId(): ?Stock
     {
-        return $this->give_stock_id;
+        return $this->give_stock;
     }
 
     public function setGiveStockId(?Stock $give_stock_id): static
     {
-        $this->give_stock_id = $give_stock_id;
+        $this->give_stock = $give_stock_id;
 
         return $this;
     }
 
     public function getTakeStockId(): ?Stock
     {
-        return $this->take_stock_id;
+        return $this->take_stock;
     }
 
     public function setTakeStockId(?Stock $take_stock_id): static
     {
-        $this->take_stock_id = $take_stock_id;
+        $this->take_stock = $take_stock_id;
 
         return $this;
     }
@@ -278,7 +278,7 @@ class Order
         if (!$this->modelsToOrders->contains($modelsToOrder))
         {
             $this->modelsToOrders->add($modelsToOrder);
-            $modelsToOrder->setOrderRef($this);
+            $modelsToOrder->setOrder($this);
         }
 
         return $this;
@@ -288,9 +288,9 @@ class Order
     {
         if ($this->modelsToOrders->removeElement($modelsToOrder))
         {
-            if ($modelsToOrder->getOrderRef() === $this)
+            if ($modelsToOrder->getOrder() === $this)
             {
-                $modelsToOrder->setOrderRef(null);
+                $modelsToOrder->setOrder(null);
             }
         }
 

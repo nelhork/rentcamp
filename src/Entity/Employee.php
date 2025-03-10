@@ -191,7 +191,8 @@ class Employee
 
     public function addOrder(Order $order): static
     {
-        if (!$this->orders->contains($order)) {
+        if (!$this->orders->contains($order))
+        {
             $this->orders->add($order);
             $order->setGiverId($this);
         }
@@ -201,9 +202,11 @@ class Employee
 
     public function removeOrder(Order $order): static
     {
-        if ($this->orders->removeElement($order)) {
+        if ($this->orders->removeElement($order))
+        {
             // set the owning side to null (unless already changed)
-            if ($order->getGiverId() === $this) {
+            if ($order->getGiverId() === $this)
+            {
                 $order->setGiverId(null);
             }
         }
@@ -221,7 +224,8 @@ class Employee
 
     public function addTakingOrder(Order $takingOrder): static
     {
-        if (!$this->taking_orders->contains($takingOrder)) {
+        if (!$this->taking_orders->contains($takingOrder))
+        {
             $this->taking_orders->add($takingOrder);
             $takingOrder->setTakerId($this);
         }
@@ -231,9 +235,11 @@ class Employee
 
     public function removeTakingOrder(Order $takingOrder): static
     {
-        if ($this->taking_orders->removeElement($takingOrder)) {
+        if ($this->taking_orders->removeElement($takingOrder))
+        {
             // set the owning side to null (unless already changed)
-            if ($takingOrder->getTakerId() === $this) {
+            if ($takingOrder->getTakerId() === $this)
+            {
                 $takingOrder->setTakerId(null);
             }
         }

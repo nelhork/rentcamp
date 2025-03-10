@@ -10,34 +10,76 @@ use Doctrine\ORM\Mapping as ORM;
 class ModelsToOrders
 {
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'modelsToOrders')]
-    #[ORM\JoinColumn(name: 'order_id', referencedColumnName: 'id', nullable: false)]
-    private ?Order $orderRef = null;
+    #[ORM\Column(name: 'order_id')]
+    private int $orderId;
 
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Model::class, inversedBy: 'modelsToOrders')]
-    #[ORM\JoinColumn(name: 'model_id', referencedColumnName: 'id', nullable: false)]
-    private ?Model $modelRef = null;
+    #[ORM\Column(name: 'model_id')]
+    private int $modelId;
 
-    public function getOrderRef(): ?Order
+    #[ORM\ManyToOne(targetEntity: Order::class)]
+    #[ORM\JoinColumn(name: 'order_id', referencedColumnName: 'id', nullable: false)]
+    private ?Order $order = null;
+
+    #[ORM\ManyToOne(targetEntity: Model::class)]
+    #[ORM\JoinColumn(name: 'model_id', referencedColumnName: 'id', nullable: false)]
+    private ?Model $model = null;
+
+    public function getOrderId(): int
     {
-        return $this->orderRef;
+        return $this->orderId;
     }
 
-    public function setOrderRef(?Order $orderRef): static
+    public function setOrderId(int $orderId): static
     {
-        $this->orderRef = $orderRef;
+        $this->orderId = $orderId;
+
         return $this;
     }
 
-    public function getModelRef(): ?Model
+    public function getModelId(): int
     {
-        return $this->modelRef;
+        return $this->modelId;
     }
 
-    public function setModelRef(?Model $modelRef): static
+    public function setModelId(int $modelId): static
     {
-        $this->modelRef = $modelRef;
+        $this->modelId = $modelId;
+
+        return $this;
+    }
+
+    public function getOrder(): ?Order
+    {
+        return $this->order;
+    }
+
+    public function setOrder(?Order $order): static
+    {
+        $this->order = $order;
+
+        if ($order)
+        {
+            $this->orderId = $order->getId();
+        }
+
+        return $this;
+    }
+
+    public function getModel(): ?Model
+    {
+        return $this->model;
+    }
+
+    public function setModel(?Model $model): static
+    {
+        $this->model = $model;
+
+        if ($model)
+        {
+            $this->modelId = $model->getId();
+        }
+
         return $this;
     }
 }

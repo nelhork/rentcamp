@@ -19,6 +19,7 @@ final class ClientController extends AbstractController
         {
             return $this->json(['message' => 'Клиент не найден'], 404);
         }
+
         return $this->json($clients);
     }
 }

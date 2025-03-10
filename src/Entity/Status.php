@@ -51,7 +51,8 @@ class Status
     public function setOrderStatus(Order $order_status): static
     {
         // set the owning side of the relation if necessary
-        if ($order_status->getStatusId() !== $this) {
+        if ($order_status->getStatusId() !== $this)
+        {
             $order_status->setStatusId($this);
         }
 

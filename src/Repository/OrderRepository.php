@@ -55,7 +55,7 @@ class OrderRepository extends ServiceEntityRepository
             ->innerJoin('o.status', 's')
             ->innerJoin('o.client', 'c')
             ->innerJoin('o.modelsToOrders', 'mto')
-            ->innerJoin('mto.modelRef', 'm')
+            ->innerJoin('mto.model', 'm')
             ->leftJoin('o.giver', 'g')
             ->leftJoin('o.taker', 't')
             ->leftJoin('o.give_stock', 'gs')
@@ -64,6 +64,63 @@ class OrderRepository extends ServiceEntityRepository
         $this->applyFilters($queryBuilder, $params);
 
         return $queryBuilder->getQuery()->getArrayResult();
+    }
+
+    public function getOrderDetails(int $orderId): array
+    {
+        $orderDetails = $this->createQueryBuilder('o')
+            ->select('
+                o.id,
+                s.name as status,
+                o.comment,
+                c.id as client_id,
+                c.name as client_name,
+                o.created,
+                o.begin,
+                o.end_time as end,
+                o.delivery_address_to,
+                o.delivery_address_from,
+                o.total_amount,
+                o.total_deposit,
+                g.id as giver_id,
+                t.id as taker_id,
+                gs.id as give_stock_id,
+                ts.id as take_stock_id
+            ')
+            ->innerJoin('o.status', 's')
+            ->innerJoin('o.client', 'c')
+            ->leftJoin('o.giver', 'g')
+            ->leftJoin('o.taker', 't')
+            ->leftJoin('o.give_stock', 'gs')
+            ->leftJoin('o.take_stock', 'ts')
+            ->where('o.id = :order_id')
+            ->setParameter('order_id', $orderId)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        $models = $this->createQueryBuilder('o')
+            ->select('
+                m.id as model_id,
+                m.name as model_name,
+                m.type as model_type,
+                COALESCE(p.price_for_period, 0) as price_for_period,
+                COALESCE(p.deposit_for_period, 0) as deposit_for_period,
+                COALESCE(p.full_price_for_period, 0) as full_price_for_period
+            ')
+            ->innerJoin('o.modelsToOrders', 'mto')
+            ->innerJoin('mto.model', 'm')
+            ->leftJoin('App\Entity\Pricelist', 'p', 'WITH', 'p.model = m')
+            ->where('o.id = :order_id')
+            ->setParameter('order_id', $orderId)
+            ->getQuery()
+            ->getArrayResult();
+
+        if (!empty($orderDetails))
+        {
+            $orderDetails['models'] = $models;
+        }
+
+        return $orderDetails;
     }
 
     private function applyFilters($queryBuilder, array $params): void
@@ -101,6 +158,7 @@ class OrderRepository extends ServiceEntityRepository
         if (!empty($params['begin']))
         {
             $date = \DateTime::createFromFormat('d.m.Y H:i:s', $params['begin']);
+
             if ($date)
             {
                 $queryBuilder->andWhere('o.begin BETWEEN :begin_start AND :begin_end')
@@ -112,6 +170,7 @@ class OrderRepository extends ServiceEntityRepository
         if (!empty($params['end_time']))
         {
             $date = \DateTime::createFromFormat('d.m.Y H:i:s', $params['end_time']);
+
             if ($date)
             {
                 $queryBuilder->andWhere('o.end_time BETWEEN :end_start AND :end_end')

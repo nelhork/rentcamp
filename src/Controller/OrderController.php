@@ -19,12 +19,21 @@ final class OrderController extends AbstractController
         return $this->json($orders);
     }
 
-    #[Route('/order/details', name: 'app_order_details', methods: ['GET'])]
+    #[Route('/order/details/filter', name: 'app_order_details_filter', methods: ['GET'])]
     public function getDetails(Request $request, OrderRepository $orderRepository): JsonResponse
     {
         $params = $request->query->all();
         $orders = $orderRepository->getListOrdersWithDetails($params);
 
         return $this->json($orders);
+    }
+
+    #[Route('order/details', name: 'app_order_details', methods: ['GET'])]
+    public function getOrderDetails(Request $request, OrderRepository $orderRepository): JsonResponse
+    {
+        $orderId = $request->query->get('id');
+        $orderDetails = $orderRepository->getOrderDetails((int)$orderId);
+
+        return $this->json($orderDetails);
     }
 }
