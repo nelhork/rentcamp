@@ -49,18 +49,14 @@ class Client
     public function __construct()
     {
         $this->orders = new ArrayCollection();
+        $this->created = new \DateTime();
+        $this->discount = 0.0;
+        $this->history = '';
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): static
-    {
-        $this->id = $id;
-
-        return $this;
     }
 
     public function getComment(): ?string

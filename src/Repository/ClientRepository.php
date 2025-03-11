@@ -36,4 +36,15 @@ class ClientRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
     }
+
+    public function findByAnyPhone(string $phone): ?Client
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.phone1 = :phone')
+            ->orWhere('c.phone2 = :phone')
+            ->orWhere('c.phone3 = :phone')
+            ->setParameter('phone', $phone)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
