@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Новый клиент{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Создание нового клиента</h1>
+
+        {% if error is defined %}
+            <div class="alert alert-danger">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% if debug is defined %}
+            <div class="alert alert-info">
+                {{ debug }}
+            </div>
+        {% endif %}
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <form method="post" action="{{ path('app_client_create') }}">
+            <div class="mb-3">
+                <label for="name" class="form-label">Имя клиента *</label>
+                <input type="text" class="form-control" id="name" name="name" required 
+                       value="{{ data.name|default('') }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="phone1" class="form-label">Основной телефон *</label>
+                <input type="tel" class="form-control" id="phone1" name="phone1" required
+                       value="{{ data.phone1|default('') }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="phone2" class="form-label">Дополнительный телефон</label>
+                <input type="tel" class="form-control" id="phone2" name="phone2"
+                       value="{{ data.phone2|default('') }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="phone3" class="form-label">Дополнительный телефон</label>
+                <input type="tel" class="form-control" id="phone3" name="phone3"
+                       value="{{ data.phone3|default('') }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="comment" class="form-label">Комментарий</label>
+                <textarea class="form-control" id="comment" name="comment" rows="3">{{ data.comment|default('') }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Создать клиента</button>
+        </form>
+    </div>
+{% endblock %} 
