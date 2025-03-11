@@ -19,8 +19,9 @@ class PricelistRepository extends ServiceEntityRepository
     public function findPrice($modelId, float $period)
     {
         $queryBuilder = $this->createQueryBuilder('p')
-            ->where('p.model_id = :modelId')
-            ->setParameter('modelId', $modelId)
+            ->join('p.model', 'm')
+            ->where('m.id = :model_id')
+            ->setParameter('model_id', $modelId)
             ->andWhere(':period BETWEEN p.period_min AND p.period_max')
             ->setParameter('period', $period)
             ->getQuery();

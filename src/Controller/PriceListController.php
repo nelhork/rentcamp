@@ -7,14 +7,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 final class PriceListController extends AbstractController
 {
     #[Route('/price', name: 'app_price_list')]
-    public function index(Request $request, PricelistRepository $priceRepository, SerializerInterface $serializer): JsonResponse
+    public function index(Request $request, PricelistRepository $priceRepository): JsonResponse
     {
-        $modelId = $request->query->get('modelId');
+        $modelId = $request->query->get('model_id');
 
         $begin = new \DateTime($request->query->get('begin'));
         $end = new \DateTime($request->query->get('end'));
@@ -26,7 +25,11 @@ final class PriceListController extends AbstractController
         foreach ($prices as $price)
         {
             $normalizePrices[] = [
-              'model_id' => $price->getModelId(), 'period_min' => $price->getPeriodMin(), 'period_max' => $price->getPeriodMax()
+                'model_id' => $price->getModel()->getId(),
+                'price_for_period' => $price->getPriceForPeriod(),
+                'deposit_for_period' => $price->getDepositForPeriod(),
+                'period_min' => $price->getPeriodMin(),
+                'period_max' => $price->getPeriodMax()
             ];
         }
 
