@@ -71,9 +71,14 @@ class Order
     #[ORM\OneToMany(targetEntity: ModelsToOrders::class, mappedBy: 'order')]
     private Collection $modelsToOrders;
 
+    #[ORM\ManyToMany(targetEntity: Item::class)]
+    #[ORM\JoinTable(name: 'items_to_orders')]
+    private Collection $items;
+
     public function __construct()
     {
         $this->modelsToOrders = new ArrayCollection();
+        $this->items = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -295,5 +300,25 @@ class Order
         }
 
         return $this;
+    }
+
+    public function addItem(Item $item): static
+    {
+        if (!$this->items->contains($item))
+        {
+            $this->items->add($item);
+        }
+        return $this;
+    }
+
+    public function removeItem(Item $item): static
+    {
+        $this->items->removeElement($item);
+        return $this;
+    }
+
+    public function getItems(): Collection
+    {
+        return $this->items;
     }
 }

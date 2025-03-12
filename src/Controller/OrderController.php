@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Stock;
 use App\Entity\Employee;
+use App\Entity\Item;
 
 final class OrderController extends AbstractController
 {
@@ -166,6 +167,17 @@ final class OrderController extends AbstractController
                 $modelsToOrders->setOrderId($order->getId());
 
                 $entityManager->persist($modelsToOrders);
+
+                $availableItems = $entityManager->getRepository(Item::class)->findAvailableItems($modelId, new \DateTime($data['begin']), new \DateTime($data['end_time']));
+
+                if (empty($availableItems))
+                {
+                    throw new \Exception("No available items found for model ID: $modelId");
+                }
+
+                $item = $availableItems[0];
+                $order->addItem($item);
+                $entityManager->persist($item);
             }
 
             $entityManager->flush();

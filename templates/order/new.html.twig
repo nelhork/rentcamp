@@ -37,16 +37,12 @@
                     <h3>Даты</h3>
                     <div class="mb-3">
                         <label for="begin" class="form-label">Дата начала *</label>
-                        <input type="datetime-local" class="form-control" id="begin" name="begin" required
-                               value="{{ data.begin|default()|date('Y-m-d\\TH:i') }}"
-                               min="{{ 'now'|date('Y-m-d\\TH:i') }}">
+                        <input type="datetime-local" class="form-control" id="begin" name="begin" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="end_time" class="form-label">Дата окончания *</label>
-                        <input type="datetime-local" class="form-control" id="end_time" name="end_time" required
-                               value="{{ data.end_time|default()|date('Y-m-d\\TH:i') }}"
-                               min="{{ 'now'|date('Y-m-d\\TH:i') }}">
+                        <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
                     </div>
                 </div>
             </div>
@@ -165,41 +161,6 @@
         // Form validation
         (function () {
             'use strict'
-            
-            // Установка минимальных дат
-            const now = new Date();
-            const beginInput = document.getElementById('begin');
-            const endInput = document.getElementById('end_time');
-            
-            // Форматирование даты для input datetime-local
-            const formatDate = (date) => {
-                return date.toISOString().slice(0, 16);
-            };
-            
-            // Установка минимальной даты для начала
-            beginInput.min = formatDate(now);
-            if (!beginInput.value) {
-                beginInput.value = formatDate(now);
-            }
-            
-            // Установка минимальной даты для окончания
-            endInput.min = formatDate(now);
-            if (!endInput.value) {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                endInput.value = formatDate(tomorrow);
-            }
-            
-            // При изменении даты начала обновляем минимальную дату окончания
-            beginInput.addEventListener('change', function() {
-                const beginDate = new Date(this.value);
-                endInput.min = formatDate(beginDate);
-                if (new Date(endInput.value) < beginDate) {
-                    endInput.value = formatDate(beginDate);
-                }
-            });
-
-            // Валидация формы
             var forms = document.querySelectorAll('.needs-validation')
             Array.prototype.slice.call(forms)
                 .forEach(function (form) {
