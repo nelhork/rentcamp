@@ -37,12 +37,12 @@
                     <h3>Даты</h3>
                     <div class="mb-3">
                         <label for="begin" class="form-label">Дата начала *</label>
-                        <input type="datetime-local" class="form-control" id="begin" name="begin" required>
+                        <input type="datetime-local" class="form-control" id="begin" name="begin" value="{{ data.begin }}" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="end_time" class="form-label">Дата окончания *</label>
-                        <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
+                        <input type="datetime-local" class="form-control" id="end_time" name="end_time" value="{{ data.end_time }}" required>
                     </div>
                 </div>
             </div>
